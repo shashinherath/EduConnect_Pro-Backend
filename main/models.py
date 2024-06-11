@@ -1,4 +1,6 @@
 from django.db import models
+from django.contrib.auth.models import AbstractUser
+
 
 # Create your models here.
 class Student(models.Model):
@@ -7,7 +9,7 @@ class Student(models.Model):
     last_name = models.CharField(max_length=100)
     email = models.EmailField(max_length=100)
     address = models.CharField(max_length=100)
-    birth_Date = models.DateField()
+    birth_date = models.DateField()
     contact = models.CharField(max_length=100)
     password = models.CharField(max_length=100)
 
