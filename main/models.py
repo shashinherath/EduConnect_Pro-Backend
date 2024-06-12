@@ -2,8 +2,13 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser
 
 # Create your models here.
+class CustomUser(AbstractUser):
+    user_type_data = ((1, "Admin"), (2, "Lecturer"), (3, "Student"))
+    user_type = models.CharField(default=1, choices=user_type_data, max_length=10)
+
 class Admin(models.Model):
     id = models.AutoField(primary_key=True)
+    admin = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
     name = models.CharField(max_length=255)
     email = models.EmailField(max_length=255)
     password = models.CharField(max_length=255)
@@ -13,6 +18,7 @@ class Admin(models.Model):
 
 class Lecturer(models.Model):
     id = models.AutoField(primary_key=True)
+    admin = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
     name = models.CharField(max_length=255)
     email = models.EmailField(max_length=255)
     password = models.CharField(max_length=255)
@@ -31,6 +37,7 @@ class Course(models.Model):
 
 class Student(models.Model):
     id = models.AutoField(primary_key=True)
+    admin = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
     name = models.CharField(max_length=255)
     email = models.EmailField(max_length=255)
     password = models.CharField(max_length=255)
