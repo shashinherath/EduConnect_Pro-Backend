@@ -1,5 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
+from django.dispatch import receiver
+from django.db.models.signals import post_save
 
 # Create your models here.
 class CustomUser(AbstractUser):
@@ -9,9 +11,6 @@ class CustomUser(AbstractUser):
 class Admin(models.Model):
     id = models.AutoField(primary_key=True)
     admin = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
-    name = models.CharField(max_length=255)
-    email = models.EmailField(max_length=255)
-    password = models.CharField(max_length=255)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     objects = models.Manager()
@@ -19,9 +18,6 @@ class Admin(models.Model):
 class Lecturer(models.Model):
     id = models.AutoField(primary_key=True)
     admin = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
-    name = models.CharField(max_length=255)
-    email = models.EmailField(max_length=255)
-    password = models.CharField(max_length=255)
     address = models.CharField(max_length=255)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -38,9 +34,6 @@ class Course(models.Model):
 class Student(models.Model):
     id = models.AutoField(primary_key=True)
     admin = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
-    name = models.CharField(max_length=255)
-    email = models.EmailField(max_length=255)
-    password = models.CharField(max_length=255)
     address = models.CharField(max_length=255)
     gender = models.CharField(max_length=255)
     profile_pic = models.ImageField(upload_to='images/')
@@ -123,3 +116,22 @@ class ChatGPT(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     objects = models.Manager()
 
+
+@receiver(post_save, sender=CustomUser)
+def create_user_profile(sender, instance, created, **kwargs):
+    if created:
+        if instance.user_type == 1:
+            Admin.objects.create(admin=instance)
+        if instance.user_type == 2:
+            Lecturer.objects.create(admin=instance)
+        if instance.user_type == 3:
+            Student.objects.create(admin=instance)
+
+@receiver(post_save, sender=CustomUser)
+def save_user_profile(sender, instance, **kwargs):
+    if instance.user_type == 1:
+        instance.admin.save()
+    if instance.user_type == 2:
+        instance.lecturer.save()
+    if instance.user_type == 3:
+        instance.student.save()
