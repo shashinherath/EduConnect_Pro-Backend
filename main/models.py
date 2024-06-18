@@ -11,6 +11,7 @@ class CustomUser(AbstractUser):
 class Admin(models.Model):
     id = models.AutoField(primary_key=True)
     admin = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
+    profile_pic = models.ImageField(upload_to='profile_pic/', default='profile_pic/default.png')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     objects = models.Manager()
@@ -18,6 +19,7 @@ class Admin(models.Model):
 class Lecturer(models.Model):
     id = models.AutoField(primary_key=True)
     admin = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
+    profile_pic = models.ImageField(upload_to='profile_pic/', default='profile_pic/default.png')
     address = models.CharField(max_length=255)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -36,7 +38,7 @@ class Student(models.Model):
     admin = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
     address = models.CharField(max_length=255)
     gender = models.CharField(max_length=255)
-    profile_pic = models.ImageField(upload_to='images/')
+    profile_pic = models.ImageField(upload_to='profile_pic/', default='profile_pic/default.png')
     course_id = models.ForeignKey(Course, on_delete=models.DO_NOTHING)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
