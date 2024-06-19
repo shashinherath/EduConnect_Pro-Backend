@@ -5,7 +5,7 @@ from rest_framework.parsers import JSONParser
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from .models import Admin, Lecturer, Course, Student, Chat, Attendence, LectureMaterial
+from .models import CustomUser, Admin, Lecturer, Course, Student, Chat, Attendence, LectureMaterial
 from .serializers import AdminSerializer
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate
@@ -50,7 +50,7 @@ def doLogout(request):
 @api_view(['POST'])
 @authentication_classes([TokenAuthentication])
 @permission_classes([IsAuthenticated])
-def addAdmin(request):
+def admin_add(request):
     if request.method == 'POST':
         admin_data = JSONParser().parse(request)
         admin_serializer = AdminSerializer(data=admin_data)
@@ -70,7 +70,9 @@ def admin_api(request):
         admins = Admin.objects.all()
         admin_serializer = AdminSerializer(admins, many=True)
         return Response(admin_serializer.data)
-    
+
+
+
 @api_view(['GET', 'PUT', 'DELETE'])
 @authentication_classes([TokenAuthentication])
 @permission_classes([IsAuthenticated])
@@ -93,6 +95,8 @@ def admin_detail(request, pk):
         return Response(admin_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     elif request.method == 'DELETE':
+        user = CustomUser.objects.get(username=admin.admin.username)
+        user.delete()
         admin.delete()
         return Response({'success': 'Admin deleted successfully'}, status=status.HTTP_204_NO_CONTENT)
     
