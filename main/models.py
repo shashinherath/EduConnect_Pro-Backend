@@ -4,6 +4,10 @@ from django.dispatch import receiver
 from django.db.models.signals import post_save
 
 # Create your models here.
+def upload_path(instance, filename):
+    file_type = filename.split('.')[-1]
+    return '/'.join(['profile_pic', str(instance.admin.username), str(instance.admin.username + '.' + file_type)])
+
 class CustomUser(AbstractUser):
     user_type_data = ((1, "Admin"), (2, "Lecturer"), (3, "Student"))
     user_type = models.CharField(default=1, choices=user_type_data, max_length=10)
@@ -11,7 +15,7 @@ class CustomUser(AbstractUser):
 class Admin(models.Model):
     id = models.AutoField(primary_key=True)
     admin = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
-    profile_pic = models.ImageField(upload_to='profile_pic/', default='profile_pic/default.png')
+    profile_pic = models.ImageField(upload_to=upload_path, default='profile_pic/default.png')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     objects = models.Manager()
@@ -19,7 +23,7 @@ class Admin(models.Model):
 class Lecturer(models.Model):
     id = models.AutoField(primary_key=True)
     admin = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
-    profile_pic = models.ImageField(upload_to='profile_pic/', default='profile_pic/default.png')
+    profile_pic = models.ImageField(upload_to=upload_path, default='profile_pic/default.png')
     address = models.CharField(max_length=255)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -38,7 +42,7 @@ class Student(models.Model):
     admin = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
     address = models.CharField(max_length=255)
     gender = models.CharField(max_length=255)
-    profile_pic = models.ImageField(upload_to='profile_pic/', default='profile_pic/default.png')
+    profile_pic = models.ImageField(upload_to=upload_path, default='profile_pic/default.png')
     course_id = models.ForeignKey(Course, on_delete=models.DO_NOTHING)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

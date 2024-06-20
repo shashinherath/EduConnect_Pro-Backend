@@ -12,7 +12,7 @@ from django.contrib.auth import authenticate
 from rest_framework.authtoken.models import Token
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.authentication import TokenAuthentication
-from rest_framework.decorators import authentication_classes, permission_classes
+from rest_framework.decorators import authentication_classes, permission_classes, parser_classes
 from django.db.models import Q
 from django.core.files.storage import default_storage
 from django.core.files.base import ContentFile
@@ -22,6 +22,7 @@ from django.core.files.storage import FileSystemStorage
 from django.core.files import File
 from django.core.files.base import ContentFile
 from django.conf import settings
+from rest_framework.parsers import MultiPartParser, FormParser
 
 #Create your views here.
 
@@ -50,9 +51,23 @@ def doLogout(request):
 @api_view(['POST'])
 @authentication_classes([TokenAuthentication])
 @permission_classes([IsAuthenticated])
+@parser_classes([MultiPartParser, FormParser])
 def admin_add(request):
     if request.method == 'POST':
-        admin_data = JSONParser().parse(request)
+        user_data = {
+            "username": request.data.get("username"),
+            "first_name": request.data.get("first_name"),
+            "last_name": request.data.get("last_name"),
+            "email": request.data.get("email"),
+            "password": request.data.get("password"),
+            "user_type": request.data.get("user_type")
+        }
+        
+        admin_data = {
+            "admin": user_data,
+            "profile_pic": request.data.get("profile_pic")
+        }
+
         admin_serializer = AdminSerializer(data=admin_data)
         if admin_serializer.is_valid():
             admin_serializer.save()

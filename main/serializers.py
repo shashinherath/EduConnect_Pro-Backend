@@ -20,8 +20,15 @@ class AdminSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         user_data = validated_data.pop('admin')
-        user = CustomUserSerializer.create(CustomUserSerializer(), validated_data=user_data)
-        admin, created = models.Admin.objects.update_or_create(admin=user, **validated_data)
+        # Check if the user already exists
+        user, user_created = models.CustomUser.objects.get_or_create(**user_data)
+        if not user_created:
+            # If the user already exists, update the user with the new data
+            for key, value in user_data.items():
+                setattr(user, key, value)
+            user.save()
+        # Now, proceed with creating or updating the Admin instance
+        admin, created = models.Admin.objects.update_or_create(admin=user, defaults=validated_data)
         return admin
 
 
