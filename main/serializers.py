@@ -30,5 +30,19 @@ class AdminSerializer(serializers.ModelSerializer):
         # Now, proceed with creating or updating the Admin instance
         admin, created = models.Admin.objects.update_or_create(admin=user, defaults=validated_data)
         return admin
+    
+    def update(self, instance, validated_data):
+        user_data = validated_data.pop('admin', None)
+        if user_data is not None:
+            user = instance.admin
+            for key, value in user_data.items():
+                if key == 'username' and user.username == value:
+                    continue  # Skip updating the username if it's the same
+                setattr(user, key, value)
+            user.save()
+        for key, value in validated_data.items():
+            setattr(instance, key, value)
+        instance.save()
+        return instance
 
 
