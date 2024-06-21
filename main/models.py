@@ -6,7 +6,7 @@ from django.db.models.signals import post_save
 # Create your models here.
 def upload_path(instance, filename):
     file_type = filename.split('.')[-1]
-    return '/'.join(['profile_pic', str(instance.admin.username), str(instance.admin.username + '.' + file_type)])
+    return '/'.join(['profile_pic', str(instance.id), str(instance.id) + '.' + file_type])
 
 class CustomUser(AbstractUser):
     user_type_data = ((1, "Admin"), (2, "Lecturer"), (3, "Student"))
