@@ -62,11 +62,12 @@ def admin_add(request):
             "password": request.data.get("password"),
             "user_type": request.data.get("user_type")
         }
-        
-        admin_data = {
-            "admin": user_data,
-            "profile_pic": request.data.get("profile_pic")
-        }
+
+        admin_data = { "admin": user_data}
+
+        if request.data.get("profile_pic"):
+            admin_data["profile_pic"] = request.data.get("profile_pic")
+
 
         admin_serializer = AdminSerializer(data=admin_data)
         if admin_serializer.is_valid():
@@ -102,8 +103,27 @@ def admin_detail(request, pk):
         return Response(admin_serializer.data)
 
     elif request.method == 'PUT':
-        admin_data = JSONParser().parse(request)
-        admin_serializer = AdminSerializer(admin, data=admin_data)
+        user_data = {}
+        
+        if 'username' in request.data and request.data['username'] != admin.admin.username:
+            user_data['username'] = request.data['username']
+        if 'first_name' in request.data and request.data['first_name'] != admin.admin.first_name:
+            user_data['first_name'] = request.data['first_name']
+        if 'last_name' in request.data and request.data['last_name'] != admin.admin.last_name:
+            user_data['last_name'] = request.data['last_name']
+        if 'email' in request.data and request.data['email'] != admin.admin.email:
+            user_data['email'] = request.data['email']
+        if 'password' in request.data and request.data['password'] != admin.admin.password:
+            user_data['password'] = request.data['password']
+        if 'user_type' in request.data and request.data['user_type'] != admin.admin.user_type:
+            user_data['user_type'] = request.data['user_type']
+
+        admin_data = { "admin": user_data}
+
+        if request.data.get("profile_pic"):
+            admin_data["profile_pic"] = request.data.get("profile_pic")
+
+        admin_serializer = AdminSerializer(admin, data=admin_data, partial=True)
         if admin_serializer.is_valid():
             admin_serializer.save()
             return Response(admin_serializer.data)
