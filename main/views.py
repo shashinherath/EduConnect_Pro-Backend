@@ -6,7 +6,7 @@ from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from .models import CustomUser, Admin, Lecturer, Course, Student, Chat, Attendence, LectureMaterial
-from .serializers import AdminSerializer, LecturerSerializer
+from .serializers import AdminSerializer, LecturerSerializer, StudentSerializer
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate
 from rest_framework.authtoken.models import Token
@@ -141,7 +141,7 @@ def admin_detail(request, pk):
         return Response({'success': 'Admin deleted successfully'}, status=status.HTTP_204_NO_CONTENT)
     
 
-#create lecturer_add api here
+
 @api_view(['POST'])
 @authentication_classes([TokenAuthentication])
 @permission_classes([IsAuthenticated])
@@ -179,7 +179,7 @@ def lecturer_add(request):
         return Response(lecturer_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
 
-#create lecturer_api api here
+
 @api_view(['GET'])
 @authentication_classes([TokenAuthentication])
 @permission_classes([IsAuthenticated])
@@ -190,7 +190,7 @@ def lecturer_api(request):
         return Response(lecturer_serializer.data)
     
 
-#create lecturer_detail api here
+
 @api_view(['GET', 'PUT', 'DELETE'])
 @authentication_classes([TokenAuthentication])
 @permission_classes([IsAuthenticated])
@@ -240,3 +240,104 @@ def lecturer_detail(request, pk):
         user.delete()
         lecturer.delete()
         return Response({'success': 'Lecturer deleted successfully'}, status=status.HTTP_204_NO_CONTENT)
+    
+
+#create student_add api here
+@api_view(['POST'])
+@authentication_classes([TokenAuthentication])
+@permission_classes([IsAuthenticated])
+@parser_classes([MultiPartParser, FormParser])
+def student_add(request):
+    if request.method == 'POST':
+        user_data = {}
+
+        if 'username' in request.data:
+            user_data['username'] = request.data['username']
+        if 'first_name' in request.data:
+            user_data['first_name'] = request.data['first_name']
+        if 'last_name' in request.data:
+            user_data['last_name'] = request.data['last_name']
+        if 'email' in request.data:
+            user_data['email'] = request.data['email']
+        if 'password' in request.data:
+            user_data['password'] = request.data['password']
+        if 'user_type' in request.data:
+            user_data['user_type'] = request.data['user_type']
+
+        student_data = { "admin": user_data}
+
+        if request.data.get("profile_pic"):
+            student_data["profile_pic"] = request.data.get("profile_pic")
+        if request.data.get("phone_number"):
+            student_data["phone_number"] = request.data.get("phone_number")
+        if request.data.get("level"):
+            student_data["level"] = request.data.get("level")
+
+        student_serializer = StudentSerializer(data=student_data, partial=True)
+        if student_serializer.is_valid():
+            student_serializer.save()
+            return Response(student_serializer.data, status=status.HTTP_201_CREATED)
+        return Response(student_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+
+#create student_api here
+@api_view(['GET'])
+@authentication_classes([TokenAuthentication])
+@permission_classes([IsAuthenticated])
+def student_api(request):
+    if request.method == 'GET':
+        students = Student.objects.all()
+        student_serializer = StudentSerializer(students, many=True)
+        return Response(student_serializer.data)
+    
+
+#create student_detail api here
+@api_view(['GET', 'PUT', 'DELETE'])
+@authentication_classes([TokenAuthentication])
+@permission_classes([IsAuthenticated])
+def student_detail(request, pk):
+    try:
+        student = Student.objects.get(pk=pk)
+    except Student.DoesNotExist:
+        return Response({'error': 'Student does not exist'}, status=status.HTTP_404_NOT_FOUND)
+
+    if request.method == 'GET':
+        student_serializer = StudentSerializer(student)
+        return Response(student_serializer.data)
+
+    elif request.method == 'PUT':
+        user_data = {}
+        
+        if 'username' in request.data and request.data['username'] != student.admin.username:
+            user_data['username'] = request.data['username']
+        if 'first_name' in request.data and request.data['first_name'] != student.admin.first_name:
+            user_data['first_name'] = request.data['first_name']
+        if 'last_name' in request.data and request.data['last_name'] != student.admin.last_name:
+            user_data['last_name'] = request.data['last_name']
+        if 'email' in request.data and request.data['email'] != student.admin.email:
+            user_data['email'] = request.data['email']
+        if 'password' in request.data and request.data['password'] != student.admin.password:
+            user_data['password'] = request.data['password']
+        if 'user_type' in request.data and request.data['user_type'] != student.admin.user_type:
+            user_data['user_type'] = request.data['user_type']
+
+        student_data = { "admin": user_data}
+
+        if request.data.get("profile_pic"):
+            student_data["profile_pic"] = request.data.get("profile_pic")
+        if request.data.get("phone_number"):
+            student_data["phone_number"] = request.data.get("phone_number")
+        if request.data.get("level"):
+            student_data["level"] = request.data.get("level")
+
+        student_serializer = StudentSerializer(student, data=student_data, partial=True)
+        if student_serializer.is_valid():
+            student_serializer.save()
+            return Response(student_serializer.data)
+        return Response(student_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    elif request.method == 'DELETE':
+        user = CustomUser.objects.get(username=student.admin.username)
+        user.delete()
+        student.delete()
+        return Response({'success': 'Student deleted successfully'}, status=status.HTTP_204_NO_CONTENT)

@@ -30,21 +30,38 @@ class Lecturer(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     objects = models.Manager()
 
-class Course(models.Model):
+class Student(models.Model):
     id = models.AutoField(primary_key=True)
-    name = models.CharField(max_length=255)
-    lecturer_id = models.ForeignKey(Lecturer, on_delete=models.CASCADE)
+    admin = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
+    phone_number = models.CharField(max_length=255)
+    level = models.CharField(max_length=255, null=True)
+    profile_pic = models.ImageField(upload_to=upload_path, default='profile_pic/default.png')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     objects = models.Manager()
 
-class Student(models.Model):
+class Course(models.Model):
     id = models.AutoField(primary_key=True)
-    admin = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
-    address = models.CharField(max_length=255)
-    gender = models.CharField(max_length=255)
-    profile_pic = models.ImageField(upload_to=upload_path, default='profile_pic/default.png')
-    course_id = models.ForeignKey(Course, on_delete=models.DO_NOTHING)
+    name = models.CharField(max_length=255)
+    description = models.TextField(max_length=255, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    objects = models.Manager()
+
+#create lecture course model here
+class LectureCourse(models.Model):
+    id = models.AutoField(primary_key=True)
+    course_id = models.ForeignKey(Course, on_delete=models.CASCADE)
+    lecture_id = models.ForeignKey(Lecturer, on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    objects = models.Manager()
+
+#create student course model here
+class StudentCourse(models.Model):
+    id = models.AutoField(primary_key=True)
+    course_id = models.ForeignKey(Course, on_delete=models.CASCADE)
+    student_id = models.ForeignKey(Student, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     objects = models.Manager()

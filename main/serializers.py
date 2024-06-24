@@ -56,14 +56,11 @@ class LecturerSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         user_data = validated_data.pop('admin')
-        # Check if the user already exists
         user, user_created = models.CustomUser.objects.get_or_create(**user_data)
         if not user_created:
-            # If the user already exists, update the user with the new data
             for key, value in user_data.items():
                 setattr(user, key, value)
             user.save()
-        # Now, proceed with creating or updating the Lecturer instance
         lecturer, created = models.Lecturer.objects.update_or_create(admin=user, defaults=validated_data)
         return lecturer
     
@@ -73,7 +70,7 @@ class LecturerSerializer(serializers.ModelSerializer):
             user = instance.admin
             for key, value in user_data.items():
                 if key == 'username' and user.username == value:
-                    continue  # Skip updating the username if it's the same
+                    continue
                 setattr(user, key, value)
             user.save()
         for key, value in validated_data.items():
@@ -82,3 +79,34 @@ class LecturerSerializer(serializers.ModelSerializer):
         return instance
 
 
+
+class StudentSerializer(serializers.ModelSerializer):
+    admin = CustomUserSerializer()
+
+    class Meta:
+        model = models.Student
+        fields = ['id', 'admin', 'profile_pic', 'level', 'phone_number', 'created_at', 'updated_at']
+
+    def create(self, validated_data):
+        user_data = validated_data.pop('admin')
+        user, user_created = models.CustomUser.objects.get_or_create(**user_data)
+        if not user_created:
+            for key, value in user_data.items():
+                setattr(user, key, value)
+            user.save()
+        student, created = models.Student.objects.update_or_create(admin=user, defaults=validated_data)
+        return student
+    
+    def update(self, instance, validated_data):
+        user_data = validated_data.pop('admin', None)
+        if user_data is not None:
+            user = instance.admin
+            for key, value in user_data.items():
+                if key == 'username' and user.username == value:
+                    continue
+                setattr(user, key, value)
+            user.save()
+        for key, value in validated_data.items():
+            setattr(instance, key, value)
+        instance.save()
+        return instance
