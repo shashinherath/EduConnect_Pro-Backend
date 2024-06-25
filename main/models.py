@@ -8,6 +8,10 @@ def upload_path(instance, filename):
     file_type = filename.split('.')[-1]
     return '/'.join(['profile_pic', str(instance.id), str(instance.id) + '.' + file_type])
 
+def upload_path_course(instance, filename):
+    file_type = filename.split('.')[-1]
+    return '/'.join(['course_images', str(instance.id), str(instance.name) + '.' + file_type])
+
 class CustomUser(AbstractUser):
     user_type_data = ((1, "Admin"), (2, "Lecturer"), (3, "Student"))
     user_type = models.CharField(default=1, choices=user_type_data, max_length=10)
@@ -43,6 +47,7 @@ class Student(models.Model):
 class Course(models.Model):
     id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=255)
+    image = models.ImageField(upload_to=upload_path_course, default='course_images/default.png')
     description = models.TextField(max_length=255, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

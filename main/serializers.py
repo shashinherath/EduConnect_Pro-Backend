@@ -110,3 +110,22 @@ class StudentSerializer(serializers.ModelSerializer):
             setattr(instance, key, value)
         instance.save()
         return instance
+    
+
+#create course serializer here
+class CourseSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.Course
+        fields = ['id', 'name', 'image', 'description', 'created_at', 'updated_at']
+
+        def create(self, validated_data):
+            course = models.Course.objects.create(**validated_data)
+            return course
+        
+        def update(self, instance, validated_data):
+            for key, value in validated_data.items():
+                setattr(instance, key, value)
+            instance.save()
+            return instance
+        
+

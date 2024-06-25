@@ -1,27 +1,13 @@
-from django.shortcuts import render
-from django.http import JsonResponse
-from django.views.decorators.csrf import csrf_exempt
-from rest_framework.parsers import JSONParser
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from .models import CustomUser, Admin, Lecturer, Course, Student, Chat, Attendence, LectureMaterial
-from .serializers import AdminSerializer, LecturerSerializer, StudentSerializer
-from django.contrib.auth.models import User
+from .serializers import AdminSerializer, CourseSerializer, LecturerSerializer, StudentSerializer
 from django.contrib.auth import authenticate
 from rest_framework.authtoken.models import Token
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.decorators import authentication_classes, permission_classes, parser_classes
-from django.db.models import Q
-from django.core.files.storage import default_storage
-from django.core.files.base import ContentFile
-from django.conf import settings
-import os
-from django.core.files.storage import FileSystemStorage
-from django.core.files import File
-from django.core.files.base import ContentFile
-from django.conf import settings
 from rest_framework.parsers import MultiPartParser, FormParser
 
 #Create your views here.
@@ -341,3 +327,72 @@ def student_detail(request, pk):
         user.delete()
         student.delete()
         return Response({'success': 'Student deleted successfully'}, status=status.HTTP_204_NO_CONTENT)
+    
+
+
+#create course_add api here
+@api_view(['POST'])
+@authentication_classes([TokenAuthentication])
+@permission_classes([IsAuthenticated])
+def course_add(request):
+    if request.method == 'POST':
+        course_data = {}
+        if 'name' in request.data:
+            course_data['name'] = request.data['name']
+        if 'description' in request.data:
+            course_data['description'] = request.data['description']
+        if 'image' in request.data:
+            course_data['image'] = request.data['image']
+
+        course_serializer = CourseSerializer(data=course_data, partial=True)
+        if course_serializer.is_valid():
+            course_serializer.save()
+            return Response(course_serializer.data, status=status.HTTP_201_CREATED)
+        return Response(course_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+
+#create course_api here
+@api_view(['GET'])
+@authentication_classes([TokenAuthentication])
+@permission_classes([IsAuthenticated])
+def course_api(request):
+    if request.method == 'GET':
+        courses = Course.objects.all()
+        course_serializer = CourseSerializer(courses, many=True)
+        return Response(course_serializer.data)
+    
+
+#create course_detail api here
+@api_view(['GET', 'PUT', 'DELETE'])
+@authentication_classes([TokenAuthentication])
+@permission_classes([IsAuthenticated])
+def course_detail(request, pk):
+    try:
+        course = Course.objects.get(pk=pk)
+    except Course.DoesNotExist:
+        return Response({'error': 'Course does not exist'}, status=status.HTTP_404_NOT_FOUND)
+
+    if request.method == 'GET':
+        course_serializer = CourseSerializer(course)
+        return Response(course_serializer.data)
+
+    elif request.method == 'PUT':
+        course_data = {}
+        
+        if 'name' in request.data and request.data['name'] != course.name:
+            course_data['name'] = request.data['name']
+        if 'description' in request.data and request.data['description'] != course.description:
+            course_data['description'] = request.data['description']
+        if 'image' in request.data and request.data['image'] != course.image:
+            course_data['image'] = request.data['image']
+
+        course_serializer = CourseSerializer(course, data=course_data, partial=True)
+        if course_serializer.is_valid():
+            course_serializer.save()
+            return Response(course_serializer.data)
+        return Response(course_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    elif request.method == 'DELETE':
+        course.delete()
+        return Response({'success': 'Course deleted successfully'}, status=status.HTTP_204_NO_CONTENT)
+    
