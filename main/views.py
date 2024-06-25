@@ -30,7 +30,28 @@ def doLogin(request):
 @permission_classes([IsAuthenticated])
 def doLogout(request):
     request.user.auth_token.delete()
-    return Response({'success': 'Logout successfully'}, status=status.HTTP_200_OK)
+    return Response({'success': 'User logged out successfully'}, status=status.HTTP_200_OK)
+
+
+
+@api_view(['GET'])
+@authentication_classes([TokenAuthentication])
+@permission_classes([IsAuthenticated])
+def current_user(request):
+    user = request.user
+    if user.user_type == "1":
+        admin = Admin.objects.get(admin=user)
+        admin_serializer = AdminSerializer(admin)
+        return Response(admin_serializer.data)
+    elif user.user_type == "2":
+        lecturer = Lecturer.objects.get(admin=user)
+        lecturer_serializer = LecturerSerializer(lecturer)
+        return Response(lecturer_serializer.data)
+    elif user.user_type == "3":
+        student = Student.objects.get(admin=user)
+        student_serializer = StudentSerializer(student)
+        return Response(student_serializer.data)
+    return Response({'error': 'Invalid User'}, status=status.HTTP_400_BAD_REQUEST)
 
 
 
@@ -396,3 +417,5 @@ def course_detail(request, pk):
         course.delete()
         return Response({'success': 'Course deleted successfully'}, status=status.HTTP_204_NO_CONTENT)
     
+
+
