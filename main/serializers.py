@@ -52,7 +52,7 @@ class LecturerSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = models.Lecturer
-        fields = ['id', 'admin', 'profile_pic', 'phone_number', 'role', 'created_at', 'updated_at']
+        fields = ['id', 'admin', 'profile_pic', 'degree', 'role', 'created_at', 'updated_at']
 
     def create(self, validated_data):
         user_data = validated_data.pop('admin')
@@ -85,7 +85,7 @@ class StudentSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = models.Student
-        fields = ['id', 'admin', 'profile_pic', 'level', 'phone_number', 'created_at', 'updated_at']
+        fields = ['id', 'admin', 'profile_pic', 'degree', 'phone_number', 'created_at', 'updated_at']
 
     def create(self, validated_data):
         user_data = validated_data.pop('admin')
@@ -116,7 +116,7 @@ class StudentSerializer(serializers.ModelSerializer):
 class CourseSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Course
-        fields = ['id', 'name', 'image', 'description', 'created_at', 'updated_at']
+        fields = ['id', 'name', 'image', 'description', 'degree', 'created_at', 'updated_at']
 
         def create(self, validated_data):
             course = models.Course.objects.create(**validated_data)

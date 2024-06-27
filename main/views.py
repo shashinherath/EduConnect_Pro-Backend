@@ -1,9 +1,10 @@
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from .models import CustomUser, Admin, Lecturer, Course, Student, Chat, Attendence, LectureMaterial
+from .models import CustomUser, Admin, Lecturer, Course, Student, Chat, LectureMaterial
 from .serializers import AdminSerializer, CourseSerializer, LecturerSerializer, StudentSerializer
 from django.contrib.auth import authenticate
+from django.contrib.auth.hashers import make_password
 from rest_framework.authtoken.models import Token
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.authentication import TokenAuthentication
@@ -72,7 +73,7 @@ def admin_add(request):
         if 'email' in request.data:
             user_data['email'] = request.data['email']
         if 'password' in request.data:
-            user_data['password'] = request.data['password']
+            user_data['password'] = make_password(request.data['password'])
         if 'user_type' in request.data:
             user_data['user_type'] = request.data['user_type']
 
@@ -125,8 +126,8 @@ def admin_detail(request, pk):
             user_data['last_name'] = request.data['last_name']
         if 'email' in request.data and request.data['email'] != admin.admin.email:
             user_data['email'] = request.data['email']
-        if 'password' in request.data and request.data['password'] != admin.admin.password:
-            user_data['password'] = request.data['password']
+        if 'password' in request.data and make_password(request.data['password']) != admin.admin.password:
+            user_data['password'] = make_password(request.data['password'])
         if 'user_type' in request.data and request.data['user_type'] != admin.admin.user_type:
             user_data['user_type'] = request.data['user_type']
 
@@ -166,7 +167,7 @@ def lecturer_add(request):
         if 'email' in request.data:
             user_data['email'] = request.data['email']
         if 'password' in request.data:
-            user_data['password'] = request.data['password']
+            user_data['password'] = make_password(request.data['password'])
         if 'user_type' in request.data:
             user_data['user_type'] = request.data['user_type']
 
@@ -174,8 +175,8 @@ def lecturer_add(request):
 
         if request.data.get("profile_pic"):
             lecturer_data["profile_pic"] = request.data.get("profile_pic")
-        if request.data.get("phone_number"):
-            lecturer_data["phone_number"] = request.data.get("phone_number")
+        if request.data.get("degree"):
+            lecturer_data["degree"] = request.data.get("degree")
         if request.data.get("role"):
             lecturer_data["role"] = request.data.get("role")
 
@@ -222,8 +223,8 @@ def lecturer_detail(request, pk):
             user_data['last_name'] = request.data['last_name']
         if 'email' in request.data and request.data['email'] != lecturer.admin.email:
             user_data['email'] = request.data['email']
-        if 'password' in request.data and request.data['password'] != lecturer.admin.password:
-            user_data['password'] = request.data['password']
+        if 'password' in request.data and make_password(request.data['password']) != lecturer.admin.password:
+            user_data['password'] = make_password(request.data['password'])
         if 'user_type' in request.data and request.data['user_type'] != lecturer.admin.user_type:
             user_data['user_type'] = request.data['user_type']
 
@@ -231,8 +232,8 @@ def lecturer_detail(request, pk):
 
         if request.data.get("profile_pic"):
             lecturer_data["profile_pic"] = request.data.get("profile_pic")
-        if request.data.get("phone_number"):
-            lecturer_data["phone_number"] = request.data.get("phone_number")
+        if request.data.get("degree"):
+            lecturer_data["degree"] = request.data.get("degree")
         if request.data.get("role"):
             lecturer_data["role"] = request.data.get("role")
 
@@ -267,7 +268,7 @@ def student_add(request):
         if 'email' in request.data:
             user_data['email'] = request.data['email']
         if 'password' in request.data:
-            user_data['password'] = request.data['password']
+            user_data['password'] = make_password(request.data['password'])
         if 'user_type' in request.data:
             user_data['user_type'] = request.data['user_type']
 
@@ -277,8 +278,8 @@ def student_add(request):
             student_data["profile_pic"] = request.data.get("profile_pic")
         if request.data.get("phone_number"):
             student_data["phone_number"] = request.data.get("phone_number")
-        if request.data.get("level"):
-            student_data["level"] = request.data.get("level")
+        if request.data.get("degree"):
+            student_data["degree"] = request.data.get("degree")
 
         student_serializer = StudentSerializer(data=student_data, partial=True)
         if student_serializer.is_valid():
@@ -323,8 +324,8 @@ def student_detail(request, pk):
             user_data['last_name'] = request.data['last_name']
         if 'email' in request.data and request.data['email'] != student.admin.email:
             user_data['email'] = request.data['email']
-        if 'password' in request.data and request.data['password'] != student.admin.password:
-            user_data['password'] = request.data['password']
+        if 'password' in request.data and make_password(request.data['password']) != student.admin.password:
+            user_data['password'] = make_password(request.data['password'])
         if 'user_type' in request.data and request.data['user_type'] != student.admin.user_type:
             user_data['user_type'] = request.data['user_type']
 
@@ -334,8 +335,8 @@ def student_detail(request, pk):
             student_data["profile_pic"] = request.data.get("profile_pic")
         if request.data.get("phone_number"):
             student_data["phone_number"] = request.data.get("phone_number")
-        if request.data.get("level"):
-            student_data["level"] = request.data.get("level")
+        if request.data.get("degree"):
+            student_data["degree"] = request.data.get("degree")
 
         student_serializer = StudentSerializer(student, data=student_data, partial=True)
         if student_serializer.is_valid():
@@ -364,6 +365,8 @@ def course_add(request):
             course_data['description'] = request.data['description']
         if 'image' in request.data:
             course_data['image'] = request.data['image']
+        if 'degree' in request.data:
+            course_data['degree'] = request.data['degree']
 
         course_serializer = CourseSerializer(data=course_data, partial=True)
         if course_serializer.is_valid():
@@ -406,6 +409,8 @@ def course_detail(request, pk):
             course_data['description'] = request.data['description']
         if 'image' in request.data and request.data['image'] != course.image:
             course_data['image'] = request.data['image']
+        if 'degree' in request.data and request.data['degree'] != course.degree:
+            course_data['degree'] = request.data['degree']
 
         course_serializer = CourseSerializer(course, data=course_data, partial=True)
         if course_serializer.is_valid():
@@ -417,5 +422,4 @@ def course_detail(request, pk):
         course.delete()
         return Response({'success': 'Course deleted successfully'}, status=status.HTTP_204_NO_CONTENT)
     
-
 
