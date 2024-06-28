@@ -112,7 +112,6 @@ class StudentSerializer(serializers.ModelSerializer):
         return instance
     
 
-#create course serializer here
 class CourseSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Course
@@ -129,3 +128,18 @@ class CourseSerializer(serializers.ModelSerializer):
             return instance
         
 
+#create lecture material serializer here
+class LectureMaterialSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.LectureMaterial
+        fields = ['id', 'title', 'description', 'file', 'course_id', 'created_at', 'updated_at']
+
+        def create(self, validated_data):
+            material = models.LectureMaterial.objects.create(**validated_data)
+            return material
+        
+        def update(self, instance, validated_data):
+            for key, value in validated_data.items():
+                setattr(instance, key, value)
+            instance.save()
+            return instance

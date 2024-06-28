@@ -2,7 +2,7 @@ from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from .models import CustomUser, Admin, Lecturer, Course, Student, Chat, LectureMaterial
-from .serializers import AdminSerializer, CourseSerializer, LecturerSerializer, StudentSerializer
+from .serializers import AdminSerializer, CourseSerializer, LectureMaterialSerializer, LecturerSerializer, StudentSerializer
 from django.contrib.auth import authenticate
 from django.contrib.auth.hashers import make_password
 from rest_framework.authtoken.models import Token
@@ -250,7 +250,7 @@ def lecturer_detail(request, pk):
         return Response({'success': 'Lecturer deleted successfully'}, status=status.HTTP_204_NO_CONTENT)
     
 
-#create student_add api here
+#student_add api
 @api_view(['POST'])
 @authentication_classes([TokenAuthentication])
 @permission_classes([IsAuthenticated])
@@ -288,7 +288,7 @@ def student_add(request):
         return Response(student_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
 
-#create student_api here
+#student_api
 @api_view(['GET'])
 @authentication_classes([TokenAuthentication])
 @permission_classes([IsAuthenticated])
@@ -299,7 +299,7 @@ def student_api(request):
         return Response(student_serializer.data)
     
 
-#create student_detail api here
+#student_detail api
 @api_view(['GET', 'PUT', 'DELETE'])
 @authentication_classes([TokenAuthentication])
 @permission_classes([IsAuthenticated])
@@ -352,7 +352,7 @@ def student_detail(request, pk):
     
 
 
-#create course_add api here
+#course_add api
 @api_view(['POST'])
 @authentication_classes([TokenAuthentication])
 @permission_classes([IsAuthenticated])
@@ -375,7 +375,7 @@ def course_add(request):
         return Response(course_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
 
-#create course_api here
+#course_api
 @api_view(['GET'])
 @authentication_classes([TokenAuthentication])
 @permission_classes([IsAuthenticated])
@@ -386,7 +386,7 @@ def course_api(request):
         return Response(course_serializer.data)
     
 
-#create course_detail api here
+#course_detail api
 @api_view(['GET', 'PUT', 'DELETE'])
 @authentication_classes([TokenAuthentication])
 @permission_classes([IsAuthenticated])
@@ -423,3 +423,73 @@ def course_detail(request, pk):
         return Response({'success': 'Course deleted successfully'}, status=status.HTTP_204_NO_CONTENT)
     
 
+#lecture material add api
+@api_view(['POST'])
+@authentication_classes([TokenAuthentication])
+@permission_classes([IsAuthenticated])
+@parser_classes([MultiPartParser, FormParser])
+def lecture_material_add(request):
+    if request.method == 'POST':
+        lecture_material_data = {}
+        if 'title' in request.data:
+            lecture_material_data['title'] = request.data['title']
+        if 'description' in request.data:
+            lecture_material_data['description'] = request.data['description']
+        if 'file' in request.data:
+            lecture_material_data['file'] = request.data['file']
+        if 'course_id' in request.data:
+            lecture_material_data['course_id'] = request.data['course_id']
+
+        lecture_material_serializer = LectureMaterialSerializer(data=lecture_material_data, partial=True)
+        if lecture_material_serializer.is_valid():
+            lecture_material_serializer.save()
+            return Response(lecture_material_serializer.data, status=status.HTTP_201_CREATED)
+        return Response(lecture_material_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+
+#lecture_material_api
+@api_view(['GET'])
+@authentication_classes([TokenAuthentication])
+@permission_classes([IsAuthenticated])
+def lecture_material_api(request):
+    if request.method == 'GET':
+        lecture_materials = LectureMaterial.objects.all()
+        lecture_material_serializer = LectureMaterialSerializer(lecture_materials, many=True)
+        return Response(lecture_material_serializer.data)
+    
+
+#lecture_material_detail api
+@api_view(['GET', 'PUT', 'DELETE'])
+@authentication_classes([TokenAuthentication])
+@permission_classes([IsAuthenticated])
+def lecture_material_detail(request, pk):
+    try:
+        lecture_material = LectureMaterial.objects.get(pk=pk)
+    except LectureMaterial.DoesNotExist:
+        return Response({'error': 'Lecture Material does not exist'}, status=status.HTTP_404_NOT_FOUND)
+
+    if request.method == 'GET':
+        lecture_material_serializer = LectureMaterialSerializer(lecture_material)
+        return Response(lecture_material_serializer.data)
+
+    elif request.method == 'PUT':
+        lecture_material_data = {}
+        
+        if 'title' in request.data and request.data['title'] != lecture_material.title:
+            lecture_material_data['title'] = request.data['title']
+        if 'description' in request.data and request.data['description'] != lecture_material.description:
+            lecture_material_data['description'] = request.data['description']
+        if 'file' in request.data and request.data['file'] != lecture_material.file:
+            lecture_material_data['file'] = request.data['file']
+        if 'course_id' in request.data and request.data['course_id'] != lecture_material.course_id:
+            lecture_material_data['course_id'] = request.data['course_id']
+
+        lecture_material_serializer = LectureMaterialSerializer(lecture_material, data=lecture_material_data, partial=True)
+        if lecture_material_serializer.is_valid():
+            lecture_material_serializer.save()
+            return Response(lecture_material_serializer.data)
+        return Response(lecture_material_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    elif request.method == 'DELETE':
+        lecture_material.delete()
+        return Response({'success': 'Lecture Material deleted successfully'}, status=status.HTTP_204_NO_CONTENT)

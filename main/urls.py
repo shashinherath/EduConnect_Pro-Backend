@@ -17,4 +17,7 @@ urlpatterns = [
     path('course_add', views.course_add, name='course_add'),
     path('course_api', views.course_api, name='course_api'),
     path('course_detail/<int:pk>', views.course_detail, name='course_detail'),
+    path('lecture_material_add', views.lecture_material_add, name='lecture_material_add'),
+    path('lecture_material_api', views.lecture_material_api, name='lecture_material_api'),
+    path('lecture_material_detail/<int:pk>', views.lecture_material_detail, name='lecture_material_detail'),
 ]
