@@ -10,11 +10,11 @@ def upload_path(instance, filename):
 
 def upload_path_course(instance, filename):
     file_type = filename.split('.')[-1]
-    return '/'.join(['course_images', str(instance.id), str(instance.name) + '.' + file_type])
+    return '/'.join(['course_images', str(instance.name), str(instance.name) + '.' + file_type])
 
 def upload_path_materials(instance, filename):
     file_type = filename.split('.')[-1]
-    return '/'.join(['lecture_materials', str(instance.id), str(instance.title) + '.' + file_type])
+    return '/'.join(['lecture_materials', str(instance.title), str(instance.filename) + '.' + file_type])
 
 class CustomUser(AbstractUser):
     user_type_data = ((1, "Admin"), (2, "Lecturer"), (3, "Student"))
@@ -72,6 +72,7 @@ class LectureMaterial(models.Model):
     id = models.AutoField(primary_key=True)
     title = models.CharField(max_length=255)
     description = models.TextField()
+    filename = models.CharField(max_length=255, null=True)
     file = models.FileField(upload_to=upload_path_materials, null=True)
     course_id = models.ForeignKey(Course, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)

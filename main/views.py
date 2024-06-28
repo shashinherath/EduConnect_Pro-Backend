@@ -435,6 +435,8 @@ def lecture_material_add(request):
             lecture_material_data['title'] = request.data['title']
         if 'description' in request.data:
             lecture_material_data['description'] = request.data['description']
+        if 'filename' in request.data:
+            lecture_material_data['filename'] = request.data['filename']
         if 'file' in request.data:
             lecture_material_data['file'] = request.data['file']
         if 'course_id' in request.data:
@@ -479,6 +481,8 @@ def lecture_material_detail(request, pk):
             lecture_material_data['title'] = request.data['title']
         if 'description' in request.data and request.data['description'] != lecture_material.description:
             lecture_material_data['description'] = request.data['description']
+        if 'filename' in request.data and request.data['filename'] != lecture_material.filename:
+            lecture_material_data['filename'] = request.data['filename']    
         if 'file' in request.data and request.data['file'] != lecture_material.file:
             lecture_material_data['file'] = request.data['file']
         if 'course_id' in request.data and request.data['course_id'] != lecture_material.course_id:

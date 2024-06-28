@@ -132,7 +132,7 @@ class CourseSerializer(serializers.ModelSerializer):
 class LectureMaterialSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.LectureMaterial
-        fields = ['id', 'title', 'description', 'file', 'course_id', 'created_at', 'updated_at']
+        fields = ['id', 'title', 'description', 'filename', 'file', 'course_id', 'created_at', 'updated_at']
 
         def create(self, validated_data):
             material = models.LectureMaterial.objects.create(**validated_data)
