@@ -150,7 +150,7 @@ class LectureMaterial(models.Model):
 
         super().delete(*args, **kwargs)
 
-class ChatGPT(models.Model):
+class EduAI(models.Model):
     id = models.AutoField(primary_key=True)
     message = models.TextField()
     response = models.TextField()
