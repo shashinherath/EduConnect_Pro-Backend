@@ -1,7 +1,10 @@
+import os
+import shutil
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.dispatch import receiver
 from django.db.models.signals import post_save
+from backend import settings
 
 # Create your models here.
 def upload_path(instance, filename):
@@ -28,6 +31,20 @@ class Admin(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     objects = models.Manager()
 
+    def delete(self, *args, **kwargs):
+        default_file_path = os.path.join(settings.MEDIA_ROOT, 'profile_pic', 'default.png')
+
+        if self.profile_pic and self.profile_pic.path != default_file_path:
+            file_path = self.profile_pic.path
+            if os.path.isfile(file_path):
+                os.remove(file_path)
+
+        directory_path = os.path.join(settings.MEDIA_ROOT, 'profile_pic', str(self.id))
+        if os.path.isdir(directory_path):
+            shutil.rmtree(directory_path)
+
+        super().delete(*args, **kwargs)
+
 class Lecturer(models.Model):
     id = models.AutoField(primary_key=True)
     admin = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
@@ -37,6 +54,20 @@ class Lecturer(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     objects = models.Manager()
+
+    def delete(self, *args, **kwargs):
+        default_file_path = os.path.join(settings.MEDIA_ROOT, 'profile_pic', 'default.png')
+
+        if self.profile_pic and self.profile_pic.path != default_file_path:
+            file_path = self.profile_pic.path
+            if os.path.isfile(file_path):
+                os.remove(file_path)
+
+        directory_path = os.path.join(settings.MEDIA_ROOT, 'profile_pic', str(self.id))
+        if os.path.isdir(directory_path):
+            shutil.rmtree(directory_path)
+
+        super().delete(*args, **kwargs)
 
 class Student(models.Model):
     id = models.AutoField(primary_key=True)
@@ -48,6 +79,20 @@ class Student(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     objects = models.Manager()
 
+    def delete(self, *args, **kwargs):
+        default_file_path = os.path.join(settings.MEDIA_ROOT, 'profile_pic', 'default.png')
+
+        if self.profile_pic and self.profile_pic.path != default_file_path:
+            file_path = self.profile_pic.path
+            if os.path.isfile(file_path):
+                os.remove(file_path)
+
+        directory_path = os.path.join(settings.MEDIA_ROOT, 'profile_pic', str(self.id))
+        if os.path.isdir(directory_path):
+            shutil.rmtree(directory_path)
+
+        super().delete(*args, **kwargs)
+
 class Course(models.Model):
     id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=255)
@@ -57,6 +102,20 @@ class Course(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     objects = models.Manager()
+
+    def delete(self, *args, **kwargs):
+        default_file_path = os.path.join(settings.MEDIA_ROOT, 'course_images', 'default.png')
+
+        if self.image and self.image.path != default_file_path:
+            file_path = self.image.path
+            if os.path.isfile(file_path):
+                os.remove(file_path)
+
+        directory_path = os.path.join(settings.MEDIA_ROOT, 'course_images', str(self.name))
+        if os.path.isdir(directory_path):
+            shutil.rmtree(directory_path)
+
+        super().delete(*args, **kwargs)
 
 class Chat(models.Model):
     id = models.AutoField(primary_key=True)
@@ -78,6 +137,18 @@ class LectureMaterial(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     objects = models.Manager()
+
+    def delete(self, *args, **kwargs):
+        if self.file:
+            file_path = self.file.path
+            if os.path.isfile(file_path):
+                os.remove(file_path)
+
+        directory_path = os.path.join(settings.MEDIA_ROOT, 'lecture_materials', str(self.title))
+        if os.path.isdir(directory_path):
+            shutil.rmtree(directory_path)
+
+        super().delete(*args, **kwargs)
 
 class ChatGPT(models.Model):
     id = models.AutoField(primary_key=True)
