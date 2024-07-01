@@ -128,7 +128,6 @@ class CourseSerializer(serializers.ModelSerializer):
             return instance
         
 
-#create lecture material serializer here
 class LectureMaterialSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.LectureMaterial
@@ -143,3 +142,16 @@ class LectureMaterialSerializer(serializers.ModelSerializer):
                 setattr(instance, key, value)
             instance.save()
             return instance
+        
+
+class AnnouncementSerializer(serializers.ModelSerializer):
+    lecturer_id = serializers.PrimaryKeyRelatedField(queryset=models.Lecturer.objects.all(), write_only=True)
+    lecturer_details = LecturerSerializer(source='lecturer_id' , read_only=True)
+
+    class Meta:
+        model = models.Announcement
+        fields = ['id', 'title', 'message', 'color_code', 'lecturer_id', 'lecturer_details', 'created_at', 'updated_at']
+
+        def create(self, validated_data):
+            announcement = models.Announcement.objects.create(**validated_data)
+            return announcement

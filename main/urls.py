@@ -20,4 +20,7 @@ urlpatterns = [
     path('lecture_material_add', views.lecture_material_add, name='lecture_material_add'),
     path('lecture_material_api', views.lecture_material_api, name='lecture_material_api'),
     path('lecture_material_detail/<int:pk>', views.lecture_material_detail, name='lecture_material_detail'),
+    path('announcement_add', views.announcement_add, name='announcement_add'),
+    path('announcement_api', views.announcement_api, name='announcement_api'),
+    path('announcement_detail/<int:pk>', views.announcement_detail, name='announcement_detail'),
 ]

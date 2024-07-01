@@ -1,8 +1,8 @@
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from .models import CustomUser, Admin, Lecturer, Course, Student, Chat, LectureMaterial
-from .serializers import AdminSerializer, CourseSerializer, LectureMaterialSerializer, LecturerSerializer, StudentSerializer
+from .models import Announcement, CustomUser, Admin, Lecturer, Course, Student, Chat, LectureMaterial
+from .serializers import AdminSerializer, AnnouncementSerializer, CourseSerializer, LectureMaterialSerializer, LecturerSerializer, StudentSerializer
 from django.contrib.auth import authenticate
 from django.contrib.auth.hashers import make_password
 from rest_framework.authtoken.models import Token
@@ -497,3 +497,74 @@ def lecture_material_detail(request, pk):
     elif request.method == 'DELETE':
         lecture_material.delete()
         return Response({'success': 'Lecture Material deleted successfully'}, status=status.HTTP_204_NO_CONTENT)
+    
+
+#create announcement_add api
+@api_view(['POST'])
+@authentication_classes([TokenAuthentication])
+@permission_classes([IsAuthenticated])
+def announcement_add(request):
+    if request.method == 'POST':
+        announcement_data = {}
+        if 'title' in request.data:
+            announcement_data['title'] = request.data['title']
+        if 'message' in request.data:
+            announcement_data['message'] = request.data['message']
+        if 'color_code' in request.data:
+            announcement_data['color_code'] = request.data['color_code']
+        if 'lecturer_id' in request.data:
+            announcement_data['lecturer_id'] = request.data['lecturer_id']
+
+        announcement_serializer = AnnouncementSerializer(data=announcement_data, partial=True)
+        if announcement_serializer.is_valid():
+            announcement_serializer.save()
+            return Response(announcement_serializer.data, status=status.HTTP_201_CREATED)
+        return Response(announcement_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+
+#announcement_api
+@api_view(['GET'])
+@authentication_classes([TokenAuthentication])
+@permission_classes([IsAuthenticated])
+def announcement_api(request):
+    if request.method == 'GET':
+        announcements = Announcement.objects.all()
+        announcement_serializer = AnnouncementSerializer(announcements, many=True)
+        return Response(announcement_serializer.data)
+    
+
+#announcement_detail api
+@api_view(['GET', 'PUT', 'DELETE'])
+@authentication_classes([TokenAuthentication])
+@permission_classes([IsAuthenticated])
+def announcement_detail(request, pk):
+    try:
+        announcement = Announcement.objects.get(pk=pk)
+    except Announcement.DoesNotExist:
+        return Response({'error': 'Announcement does not exist'}, status=status.HTTP_404_NOT_FOUND)
+
+    if request.method == 'GET':
+        announcement_serializer = AnnouncementSerializer(announcement)
+        return Response(announcement_serializer.data)
+
+    elif request.method == 'PUT':
+        announcement_data = {}
+        
+        if 'title' in request.data and request.data['title'] != announcement.title:
+            announcement_data['title'] = request.data['title']
+        if 'message' in request.data and request.data['message'] != announcement.message:
+            announcement_data['message'] = request.data['message']
+        if 'color_code' in request.data and request.data['color_code'] != announcement.color_code:
+            announcement_data['color_code'] = request.data['color_code']
+        if 'lecturer_id' in request.data and request.data['lecturer_id'] != announcement.lecturer_id:
+            announcement_data['lecturer_id'] = request.data['lecturer_id']
+
+        announcement_serializer = AnnouncementSerializer(announcement, data=announcement_data, partial=True)
+        if announcement_serializer.is_valid():
+            announcement_serializer.save()
+            return Response(announcement_serializer.data)
+        return Response(announcement_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    elif request.method == 'DELETE':
+        announcement.delete()
+        return Response({'success': 'Announcement deleted successfully'}, status=status.HTTP_204_NO_CONTENT)

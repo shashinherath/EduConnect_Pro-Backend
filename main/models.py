@@ -159,6 +159,16 @@ class EduAI(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     objects = models.Manager()
 
+class Announcement(models.Model):
+    id = models.AutoField(primary_key=True)
+    title = models.CharField(max_length=255)
+    message = models.TextField(max_length=255)
+    color_code = models.CharField(max_length=255)
+    lecturer_id = models.ForeignKey(Lecturer, on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    objects = models.Manager()
+
 
 @receiver(post_save, sender=CustomUser)
 def create_user_profile(sender, instance, created, **kwargs):
