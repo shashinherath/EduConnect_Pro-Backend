@@ -11,6 +11,11 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 """
 
 from pathlib import Path
+from os import getenv
+from dotenv import load_dotenv
+
+env_path = '../.env'
+load_dotenv(env_path)
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -79,7 +84,7 @@ WSGI_APPLICATION = 'backend.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
-DATABASES = {
+""" DATABASES = {
     'default': {
         "ENGINE": "django.db.backends.postgresql",
         "NAME": "educonnect_pro",
@@ -88,6 +93,20 @@ DATABASES = {
         "HOST": "localhost",
         "PORT": "5432",
     }
+} """
+
+DATABASES = {
+  'default': {
+    'ENGINE': 'django.db.backends.postgresql',
+    'NAME': 'educonnect_pro',
+    'USER': 'educonnect_pro_owner',
+    'PASSWORD': 'ZKqAu0fkDoe7',
+    'HOST': 'ep-sweet-wave-a1dlwbx3.ap-southeast-1.aws.neon.tech',
+    'PORT': '5432',
+    'OPTIONS': {
+      'sslmode': 'require',
+    },
+  }
 }
 
 
