@@ -155,3 +155,13 @@ class AnnouncementSerializer(serializers.ModelSerializer):
         def create(self, validated_data):
             announcement = models.Announcement.objects.create(**validated_data)
             return announcement
+        
+
+class ChatSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.Chat
+        fields = ['id', 'message', 'lecturer_id', 'student_id', 'sender_id', 'created_at', 'updated_at']
+
+        def create(self, validated_data):
+            chat = models.Chat.objects.create(**validated_data)
+            return chat

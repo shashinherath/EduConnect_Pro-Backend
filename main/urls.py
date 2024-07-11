@@ -23,4 +23,7 @@ urlpatterns = [
     path('announcement_add', views.announcement_add, name='announcement_add'),
     path('announcement_api', views.announcement_api, name='announcement_api'),
     path('announcement_detail/<int:pk>', views.announcement_detail, name='announcement_detail'),
+    path('chat_add', views.chat_add, name='chat_add'),
+    path('chat_api_student/<int:id>', views.chat_api_student, name='chat_api_student'),
+    path('chat_api_lecturer/<int:id>', views.chat_api_lecturer, name='chat_api_lecturer'),
 ]

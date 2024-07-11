@@ -2,7 +2,7 @@ from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from .models import Announcement, CustomUser, Admin, Lecturer, Course, Student, Chat, LectureMaterial
-from .serializers import AdminSerializer, AnnouncementSerializer, CourseSerializer, LectureMaterialSerializer, LecturerSerializer, StudentSerializer
+from .serializers import AdminSerializer, AnnouncementSerializer, ChatSerializer, CourseSerializer, LectureMaterialSerializer, LecturerSerializer, StudentSerializer
 from django.contrib.auth import authenticate
 from django.contrib.auth.hashers import make_password
 from rest_framework.authtoken.models import Token
@@ -568,3 +568,56 @@ def announcement_detail(request, pk):
     elif request.method == 'DELETE':
         announcement.delete()
         return Response({'success': 'Announcement deleted successfully'}, status=status.HTTP_204_NO_CONTENT)
+    
+
+#create chat add api
+@api_view(['POST'])
+@authentication_classes([TokenAuthentication])
+@permission_classes([IsAuthenticated])
+def chat_add(request):
+    if request.method == 'POST':
+        chat_data = {}
+        if 'message' in request.data:
+            chat_data['message'] = request.data['message']
+        if 'lecturer_id' in request.data:
+            chat_data['lecturer_id'] = request.data['lecturer_id']
+        if 'student_id' in request.data:
+            chat_data['student_id'] = request.data['student_id']
+        if 'sender_id' in request.data:
+            chat_data['sender_id'] = request.data['sender_id']
+
+        chat_serializer = ChatSerializer(data=chat_data, partial=True)
+        if chat_serializer.is_valid():
+            chat_serializer.save()
+            return Response(chat_serializer.data, status=status.HTTP_201_CREATED)
+        return Response(chat_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+
+#chat_api_student
+@api_view(['GET'])
+@authentication_classes([TokenAuthentication])
+@permission_classes([IsAuthenticated])
+def chat_api_student(request, id):
+    try:
+        chat = Chat.objects.filter(student_id = id)
+    except Chat.DoesNotExist:
+        return Response({'error': 'Chat does not exist'}, status=status.HTTP_404_NOT_FOUND)
+
+    if request.method == 'GET':
+        chat_serializer = ChatSerializer(chat, many=True)
+        return Response(chat_serializer.data, status=status.HTTP_200_OK)
+    
+
+#chat_api_lecturer
+@api_view(['GET'])
+@authentication_classes([TokenAuthentication])
+@permission_classes([IsAuthenticated])
+def chat_api_lecturer(request, id):
+    try:
+        chat = Chat.objects.filter(lecturer_id = id)
+    except Chat.DoesNotExist:
+        return Response({'error': 'Chat does not exist'}, status=status.HTTP_404_NOT_FOUND)
+
+    if request.method == 'GET':
+        chat_serializer = ChatSerializer(chat, many=True)
+        return Response(chat_serializer.data, status=status.HTTP_200_OK)
