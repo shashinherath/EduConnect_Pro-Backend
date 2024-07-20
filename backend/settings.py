@@ -14,7 +14,7 @@ from pathlib import Path
 from os import getenv
 from dotenv import load_dotenv
 
-env_path = '../.env'
+env_path = Path('.') / '.env'
 load_dotenv(env_path)
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -98,10 +98,10 @@ WSGI_APPLICATION = 'backend.wsgi.application'
 DATABASES = {
   'default': {
     'ENGINE': 'django.db.backends.postgresql',
-    'NAME': 'educonnect_pro',
-    'USER': 'educonnect_pro_owner',
-    'PASSWORD': 'ZKqAu0fkDoe7',
-    'HOST': 'ep-sweet-wave-a1dlwbx3.ap-southeast-1.aws.neon.tech',
+    'NAME': getenv('PGDATABASE'),
+    'USER': getenv('PGUSER'),
+    'PASSWORD': getenv('PGPASSWORD'),
+    'HOST': getenv('PGHOST'),
     'PORT': '5432',
     'OPTIONS': {
       'sslmode': 'require',
@@ -109,6 +109,9 @@ DATABASES = {
   }
 }
 
+
+# OpenAI API Key
+OPENAI_API_KEY = getenv('OPENAI_API_KEY')
 
 # Password validation
 # https://docs.djangoproject.com/en/5.0/ref/settings/#auth-password-validators
