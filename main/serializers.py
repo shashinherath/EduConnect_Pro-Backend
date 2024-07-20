@@ -165,3 +165,13 @@ class ChatSerializer(serializers.ModelSerializer):
         def create(self, validated_data):
             chat = models.Chat.objects.create(**validated_data)
             return chat
+        
+
+class EduAISerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.EduAI
+        fields = ['id', 'message', 'response', 'student_id', 'created_at', 'updated_at']
+
+        def create(self, validated_data):
+            edu_ai = models.EduAI.objects.create(**validated_data)
+            return edu_ai

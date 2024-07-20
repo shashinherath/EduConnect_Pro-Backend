@@ -26,4 +26,6 @@ urlpatterns = [
     path('chat_add', views.chat_add, name='chat_add'),
     path('chat_api_student/<int:id>', views.chat_api_student, name='chat_api_student'),
     path('chat_api_lecturer/<int:id>', views.chat_api_lecturer, name='chat_api_lecturer'),
+    path('eduai_add', views.eduai_add, name='eduai_add'),
+    path('eduai_api/<int:id>', views.eduai_api, name='eduai_api'),
 ]

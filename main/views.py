@@ -1,8 +1,10 @@
+import openai
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from .models import Announcement, CustomUser, Admin, Lecturer, Course, Student, Chat, LectureMaterial
-from .serializers import AdminSerializer, AnnouncementSerializer, ChatSerializer, CourseSerializer, LectureMaterialSerializer, LecturerSerializer, StudentSerializer
+from backend import settings
+from .models import Announcement, CustomUser, Admin, EduAI, Lecturer, Course, Student, Chat, LectureMaterial
+from .serializers import AdminSerializer, AnnouncementSerializer, ChatSerializer, CourseSerializer, EduAISerializer, LectureMaterialSerializer, LecturerSerializer, StudentSerializer
 from django.contrib.auth import authenticate
 from django.contrib.auth.hashers import make_password
 from rest_framework.authtoken.models import Token
@@ -12,6 +14,7 @@ from rest_framework.decorators import authentication_classes, permission_classes
 from rest_framework.parsers import MultiPartParser, FormParser
 
 #Create your views here.
+openai.api_key = settings.OPENAI_API_KEY
 
 @api_view(['POST'])
 def doLogin(request):
@@ -621,3 +624,55 @@ def chat_api_lecturer(request, id):
     if request.method == 'GET':
         chat_serializer = ChatSerializer(chat, many=True)
         return Response(chat_serializer.data, status=status.HTTP_200_OK)
+    
+
+#eduai_add api
+@api_view(['POST'])
+@authentication_classes([TokenAuthentication])
+@permission_classes([IsAuthenticated])
+def eduai_add(request):
+    if request.method == 'POST':
+        eduai_data = {}
+        if 'message' in request.data:
+            eduai_data['message'] = request.data['message']
+        else:
+            return Response({'error': 'Message is required.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        if 'student_id' in request.data:
+            eduai_data['student_id'] = request.data['student_id']
+        else:
+            return Response({'error': 'Student ID is required.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            response = openai.ChatCompletion.create(
+                model="gpt-3.5-turbo",
+                messages=[
+                    {"role": "system", "content": "Format the answer using markdown language."},
+                    {"role": "user", "content": eduai_data['message']}
+                ]
+            )
+            ai_response = response.choices[0].message['content']
+            eduai_data['response'] = ai_response
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+        eduai_serializer = EduAISerializer(data=eduai_data, partial=True)
+        if eduai_serializer.is_valid():
+            eduai_serializer.save()
+            return Response(eduai_serializer.data, status=status.HTTP_201_CREATED)
+        return Response(eduai_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+
+#eduai_api
+@api_view(['GET'])
+@authentication_classes([TokenAuthentication])
+@permission_classes([IsAuthenticated])
+def eduai_api(request, id):
+    try:
+        eduai = EduAI.objects.filter(student_id = id)
+    except EduAI.DoesNotExist:
+        return Response({'error': 'EduAI does not exist'}, status=status.HTTP_404_NOT_FOUND)
+
+    if request.method == 'GET':
+        eduai_serializer = EduAISerializer(eduai, many=True)
+        return Response(eduai_serializer.data, status=status.HTTP_200_OK)
