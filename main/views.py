@@ -13,7 +13,7 @@ from rest_framework.authentication import TokenAuthentication
 from rest_framework.decorators import authentication_classes, permission_classes, parser_classes
 from rest_framework.parsers import MultiPartParser, FormParser
 
-#Create your views here.
+
 openai.api_key = settings.OPENAI_API_KEY
 
 @api_view(['POST'])
@@ -502,7 +502,7 @@ def lecture_material_detail(request, pk):
         return Response({'success': 'Lecture Material deleted successfully'}, status=status.HTTP_204_NO_CONTENT)
     
 
-#create announcement_add api
+#announcement_add api
 @api_view(['POST'])
 @authentication_classes([TokenAuthentication])
 @permission_classes([IsAuthenticated])
