@@ -9,7 +9,7 @@ https://docs.djangoproject.com/en/5.0/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.0/ref/settings/
 """
-
+import os 
 from pathlib import Path
 from os import getenv
 from dotenv import load_dotenv
@@ -25,12 +25,16 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-#a##inr04ay6#rhq77kl_46u_uz%@xzdw4^bg$&kww1^@j*ej6'
+SECRET_KEY = os.environ['MY_SECRET_KEY']
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = []
+# ALLOWED_HOSTS
+ALLOWED_HOSTS = [os.environ['WEBSITE_HOSTNAME']]
+
+# CSRF Trusted Origins
+CSRF_TRUSTED_ORIGINS = ['https://'+os.environ['WEBSITE_HOSTNAME']]
 
 
 # Application definition
@@ -51,6 +55,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -84,34 +89,21 @@ WSGI_APPLICATION = 'backend.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
-""" DATABASES = {
-    'default': {
-        "ENGINE": "django.db.backends.postgresql",
-        "NAME": "educonnect_pro",
-        "USER": "postgres",
-        "PASSWORD": "postgres",
-        "HOST": "localhost",
-        "PORT": "5432",
-    }
-} """
+CONNECTION = os.environ['AZURE_POSTGRESQL_CONNECTIONSTRING']
+CONNECTION_STR = {pair.split('=')[0]:pair.split('=')[1] for pair in CONNECTION.split(' ')}
 
 DATABASES = {
-  'default': {
-    'ENGINE': 'django.db.backends.postgresql',
-    'NAME': getenv('PGDATABASE'),
-    'USER': getenv('PGUSER'),
-    'PASSWORD': getenv('PGPASSWORD'),
-    'HOST': getenv('PGHOST'),
-    'PORT': '5432',
-    'OPTIONS': {
-      'sslmode': 'require',
-    },
-  }
+    "default": {
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": CONNECTION_STR['dbname'],
+        "HOST": CONNECTION_STR['host'],
+        "USER": CONNECTION_STR['user'],
+        "PASSWORD": CONNECTION_STR['password'],
+    }
 }
 
-
 # OpenAI API Key
-OPENAI_API_KEY = getenv('OPENAI_API_KEY')
+OPENAI_API_KEY = os.environ['OPENAI_API_KEY']
 
 # Password validation
 # https://docs.djangoproject.com/en/5.0/ref/settings/#auth-password-validators
@@ -131,6 +123,7 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+# Internationalization
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework.authentication.TokenAuthentication',
@@ -140,9 +133,18 @@ REST_FRAMEWORK = {
 
 # Configuring CORS
 CORS_ALLOWED_ORIGINS = [
-    "http://localhost:3000",
+    "https://thankful-hill-0875cbc00.5.azurestaticapps.net/",
 ]
 
+# Static files (CSS, JavaScript, Images)
+STORAGES = {
+    "default": {
+        "BACKEND": "django.core.files.storage.FileSystemStorage",
+    },
+    "staticfiles": {
+        "BACKEND": "whitenoise.storage.CompressedStaticFilesStorage",
+    },
+}
 
 
 # Internationalization
@@ -167,8 +169,9 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-
+# Custom User Model
 AUTH_USER_MODEL = 'main.CustomUser'
 
+# Media Files
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
