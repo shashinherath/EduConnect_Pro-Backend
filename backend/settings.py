@@ -89,7 +89,7 @@ WSGI_APPLICATION = 'backend.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
-CONNECTION = os.environ['AZURE_POSTGRESQL_CONNECTIONSTRING']
+""" CONNECTION = os.environ['AZURE_POSTGRESQL_CONNECTIONSTRING']
 CONNECTION_STR = {pair.split('=')[0]:pair.split('=')[1] for pair in CONNECTION.split(' ')}
 
 DATABASES = {
@@ -100,6 +100,20 @@ DATABASES = {
         "USER": CONNECTION_STR['user'],
         "PASSWORD": CONNECTION_STR['password'],
     }
+} """
+
+DATABASES = {
+  'default': {
+    'ENGINE': 'django.db.backends.postgresql',
+    'NAME': os.environ['PGDATABASE'],
+    'USER': os.environ['PGUSER'],
+    'PASSWORD': os.environ['PGPASSWORD'],
+    'HOST': os.environ['PGHOST'],
+    'PORT': '5432',
+    'OPTIONS': {
+      'sslmode': 'require',
+    },
+  }
 }
 
 # OpenAI API Key
