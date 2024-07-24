@@ -147,7 +147,7 @@ REST_FRAMEWORK = {
 
 # Configuring CORS
 CORS_ALLOWED_ORIGINS = [
-    "https://thankful-hill-0875cbc00.5.azurestaticapps.net/",
+    "https://thankful-hill-0875cbc00.5.azurestaticapps.net",
 ]
 
 # Static files (CSS, JavaScript, Images)
