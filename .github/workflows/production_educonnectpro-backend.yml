@@ -33,6 +33,7 @@ jobs:
       - name: Collect static files
         env:
           MY_SECRET_KEY: ${{ secrets.MY_SECRET_KEY }}
+          WEBSITE_HOSTNAME: ${{ secrets.WEBSITE_HOSTNAME }}
         run: |
           python manage.py collectstatic --noinput
 
