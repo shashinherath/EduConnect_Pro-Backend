@@ -89,31 +89,20 @@ WSGI_APPLICATION = 'backend.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
-CONNECTION = os.environ['AZURE_POSTGRESQL_CONNECTIONSTRING', '']
-
-if not CONNECTION:
-    raise ValueError("AZURE_POSTGRESQL_CONNECTIONSTRING environment variable is not set.")
-
-try:
-    CONNECTION_STR = {pair.split('=')[0]: pair.split('=')[1] for pair in CONNECTION.split(' ')}
-except IndexError as e:
-    raise ValueError(f"Error parsing the connection string: {CONNECTION}") from e
+""" CONNECTION = os.environ['AZURE_POSTGRESQL_CONNECTIONSTRING']
+CONNECTION_STR = {pair.split('=')[0]:pair.split('=')[1] for pair in CONNECTION.split(' ')}
 
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
-        "NAME": CONNECTION_STR.get('dbname', ''),
-        "HOST": CONNECTION_STR.get('host', ''),
-        "USER": CONNECTION_STR.get('user', ''),
-        "PASSWORD": CONNECTION_STR.get('password', ''),
-        "PORT": CONNECTION_STR.get('port', '5432'),
-        "OPTIONS": {
-            "sslmode": CONNECTION_STR.get('sslmode', 'require')
-        }
+        "NAME": CONNECTION_STR['dbname'],
+        "HOST": CONNECTION_STR['host'],
+        "USER": CONNECTION_STR['user'],
+        "PASSWORD": CONNECTION_STR['password'],
     }
-}
+} """
 
-""" DATABASES = {
+DATABASES = {
   'default': {
     'ENGINE': 'django.db.backends.postgresql',
     'NAME': os.environ['PGDATABASE'],
@@ -125,7 +114,7 @@ DATABASES = {
       'sslmode': 'require',
     },
   }
-} """
+}
 
 # OpenAI API Key
 OPENAI_API_KEY = os.environ['OPENAI_API_KEY']
