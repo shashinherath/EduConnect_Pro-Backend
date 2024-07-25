@@ -34,6 +34,7 @@ jobs:
         env:
           MY_SECRET_KEY: ${{ secrets.MY_SECRET_KEY }}
           WEBSITE_HOSTNAME: ${{ secrets.WEBSITE_HOSTNAME }}
+          AZURE_POSTGRESQL_CONNECTIONSTRING: ${{ secrets.AZURE_POSTGRESQL_CONNECTIONSTRING }}
           PGDATABASE: ${{ secrets.PGDATABASE }}
           PGUSER: ${{ secrets.PGUSER }}
           PGPASSWORD: ${{ secrets.PGPASSWORD }}
