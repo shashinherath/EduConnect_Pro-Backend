@@ -1,2 +1,62 @@
-.env
-media/lecture_materials/
+# Python
+*.pyc
+*.pyo
+*.pyd
+__pycache__/
+*.env
+*.venv/
+venv/
+ENV/
+env/
+.venv/
+env.bak/
+venv.bak/
+
+# Django
+*.log
+local_settings.py
+db.sqlite3
+db.sqlite3-journal
+/media/
+staticfiles/
+*.bak
+
+# Ignore the entire virtual environment
+.vscode/
+.idea/
+*.DS_Store
+
+# Node.js
+node_modules/
+
+# Pytest and Coverage
+htmlcov/
+.tox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+.pytest_cache/
+
+# Django migrations
+*/migrations/__pycache__/
+*/migrations/*.pyc
+*/migrations/*.pyo
+*/migrations/*.pyd
+**/migrations/*
+
+# Docker
+*.pid
+*.sock
+.env.dev
+.env.prod
+docker-compose.override.yml
+
+# Other
+*.sublime-project
+*.sublime-workspace
+*.swp
